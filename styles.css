@@ -21,8 +21,8 @@ html,body{
 .clock{font-size:var(--header-size);font-variant-numeric:tabular-nums;color:var(--accent);
   text-shadow:0 0 18px rgba(97,218,251,.25);}
 
-.forecast{display:grid;gap:var(--gap);grid-template-columns:repeat(7,1fr);align-content:center;}
-@media (max-aspect-ratio:4/3),(max-width:1200px){.forecast{grid-template-columns:repeat(4,1fr);} }
+.forecast{display:grid;gap:var(--gap);grid-template-columns:repeat(5,1fr);align-content:center;}
+@media (max-aspect-ratio:4/3),(max-width:1200px){.forecast{grid-template-columns:repeat(5,1fr);} }
 @media (max-width:900px){.forecast{grid-template-columns:repeat(3,1fr);} }
 
 .card{
@@ -56,3 +56,4 @@ html,body{
 .diag b{color:var(--warn);} .diag .err{color:var(--err);}
 
 *{user-select:none;}
+
