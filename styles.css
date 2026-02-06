@@ -33,6 +33,11 @@ html,body{
   filter: drop-shadow(0 0 8px rgba(0,0,0,.6));
 }
 
+.clock{
+  justify-self:end;
+}
+
+
 .title{font-size:var(--header-size);font-weight:700;display:flex;align-items:baseline;gap:.6em;}
 .location{color:var(--muted);font-size:calc(var(--header-size)*.6);font-weight:500;}
 .clock{font-size:var(--header-size);font-variant-numeric:tabular-nums;color:var(--accent);
@@ -73,6 +78,7 @@ html,body{
 .diag b{color:var(--warn);} .diag .err{color:var(--err);}
 
 *{user-select:none;}
+
 
 
 
