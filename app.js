@@ -4,7 +4,7 @@ const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 const WEATHER_API = `https://api.open-meteo.com/v1/forecast`
   + `?latitude=${LAT}&longitude=${LON}`
   + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant`
-  + `&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+  + `&timezone=auto&forecast_days=10&temperature_unit=fahrenheit&wind_speed_unit=mph`;
 
 /* ===== Diagnostics ===== */
 
@@ -141,5 +141,6 @@ refreshWeather();
 setInterval(refreshWeather, WEATHER_REFRESH_MS);
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refreshWeather(); });
 setTimeout(()=>{ const ok=document.getElementById('forecast').children.length>0; if(!ok) refreshWeather(); },8000);
+
 
 
