@@ -7,11 +7,25 @@ const WEATHER_API = `https://api.open-meteo.com/v1/forecast`
   + `&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&wind_speed_unit=mph`;
 
 /* ===== Diagnostics ===== */
+
 const diagEl = document.getElementById('diag');
-function showDiag(msg, isError=false){
+let diagTimer = null;
+
+function showDiag(msg, isError = false) {
+  if (!diagEl) return;
   diagEl.style.display = 'block';
-  diagEl.innerHTML = (isError ? '<b class="err">Error:</b> ' : '<b>Info:</b> ') + msg;
+
+  diagEl.innerHTML =
+    (isError ? '<b class="err">Error:</b> ' : '<b>Info:</b> ') + msg;
+
+  // Always hide after 5 seconds
+  clearTimeout(diagTimer);
+  diagTimer = setTimeout(() => {
+    diagEl.style.display = 'none';
+  }, 5000);
+
 }
+
 
 /* ===== Clock ===== */
 function updateClock(){
@@ -95,7 +109,7 @@ function renderWeather(data){
   }
   setStatus(true,'Live');
   document.getElementById('updated').textContent='Last updated: '+new Date().toLocaleTimeString();
-  /showDiag('Forecast loaded successfully.');
+  showDiag('Forecast loaded successfully.');
 }
 
 let firstFetchDone=false;
@@ -127,4 +141,5 @@ refreshWeather();
 setInterval(refreshWeather, WEATHER_REFRESH_MS);
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refreshWeather(); });
 setTimeout(()=>{ const ok=document.getElementById('forecast').children.length>0; if(!ok) refreshWeather(); },8000);
+
 
