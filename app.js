@@ -73,7 +73,7 @@ const LABELS={0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog'
   80:'Showers',81:'Showers',82:'Heavy showers',85:'Snow showers',86:'Snow showers',
   95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'};
 
-function dayLabel(s){const d=new Date(s+'T12:00:00');return d.toLocaleDateString(undefined,{weekday:'short'});}
+function dayLabel(s){const d=new Date(s+'T12:00:00');const weekday = d.toLocaleDateString(undefined, { weekday: 'short' });const dayNum = d.toLocaleDateString(undefined, { day: '2-digit' });return `${weekday} ${dayNum}`;);}
 function degToCardinal(deg){const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];return dirs[Math.round((deg%360)/22.5)%16];}
 
 function renderWeather(data){
@@ -141,6 +141,7 @@ refreshWeather();
 setInterval(refreshWeather, WEATHER_REFRESH_MS);
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refreshWeather(); });
 setTimeout(()=>{ const ok=document.getElementById('forecast').children.length>0; if(!ok) refreshWeather(); },8000);
+
 
 
 
