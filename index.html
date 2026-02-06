@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Intentionally no meta CSP here (some signage engines inject their own) -->
+  <!-- Intentionally no meta CSP here (some signage webviews inject their own) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dallas Weather + Stock Ticker</title>
-  styles.css
+  <!-- Cache-bust to defeat any old cached file -->
+  styles.css?v=2
 </head>
 <body>
   <div class="app">
@@ -31,12 +32,11 @@
     </div>
   </div>
 
-  <!-- On-screen diagnostics -->
+  <!-- On-screen diagnostics (shows any fetch/HTTP error) -->
   <div id="diag" class="diag"></div>
 
-  <!-- TradingView Ticker (no API key) – iframe method is signage/CMS friendly -->
+  <!-- TradingView ticker (no API key). Edit the JSON after # to change symbols -->
   <div class="ticker">
-    <!-- You can change symbols by editing the JSON after the '#' -->
     <iframe title="Stock Ticker"
       src="https://s.tradingview.com/embed-widget/ticker-tape/?locale=en#{
         &quot;symbols&quot;:[
@@ -48,7 +48,7 @@
           {&quot;proName&quot;:&quot;NASDAQ:META&quot;,&quot;title&quot;:&quot;Meta&quot;},
           {&quot;proName&quot;:&quot;NASDAQ:TSLA&quot;,&quot;title&quot;:&quot;Tesla&quot;},
           {&quot;proName&quot;:&quot;NYSE:UNH&quot;,&quot;title&quot;:&quot;UnitedHealth&quot;},
-          {&quot;;title&quot;:&quot;JPMorgan&quot;},
+          {&quot;proName&quot;:&quot;NYSE:JPM&quot;,&quot;title&quot;:&quot;JPMorgan&quot;},
           {&quot;proName&quot;:&quot;NYSE:XOM&quot;,&quot;title&quot;:&quot;ExxonMobil&quot;}
         ],
         &quot;showSymbolLogo&quot;:true,
@@ -56,11 +56,7 @@
         &quot;isTransparent&quot;:true,
         &quot;displayMode&quot;:&quot;adaptive&quot;,
         &quot;locale&quot;:&quot;en&quot;
-      }
-    </iframe>
-  </div>
-
-  <!-- External JS (no inline scripts) -->
-  app.js</script>
+xternal JS (no inline scripts). Cache-busted -->
+  app.js?v=2</script>
 </body>
 </html>
