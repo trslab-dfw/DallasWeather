@@ -2,54 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- No meta CSP here to avoid conflicts in signage environments -->
+  <!-- CSP tuned for Open‑Meteo requests and inline CSS/JS used by many signage CMSes -->
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self' https://api.open-meteo.com https://*.open-meteo.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src https://api.open-meteo.com https://*.open-meteo.com;"
+  />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>7-Day Forecast + Stock Ticker (Diagnostics)</title>
+  <title>7-Day Forecast - Full Screen</title>
+
   <style>
-    :root{
-      --bg:#061525; --accent:#61dafb; --text:#eaf6ff; --muted:#a7c4de;
-      --base-size:min(1.2vw,18px); --header-size:calc(var(--base-size)*2.2);
-      --day-title:calc(var(--base-size)*1.4); --forecast-text:calc(var(--base-size)*1.05);
-      --metric-text:calc(var(--base-size)*1.0); --temp-size:calc(var(--base-size)*2.2);
-      --small:calc(var(--base-size)*0.95); --gap:calc(var(--base-size)*0.9);
-      --radius:14px; --ticker-h:48px;
-      --warn:#ffcc00; --err:#ff6b6b;
+    :root {
+      /* Quick signage theming */
+      --bg: #061525;
+      --accent: #61dafb;
+      --text: #eaf6ff;
+      --muted: #a7c4de;
+
+      /* Scale knobs: increase --base-size for even larger UI */
+      --base-size: min(1.2vw, 18px);
+      --header-size: calc(var(--base-size) * 2.2);
+      --day-title: calc(var(--base-size) * 1.4);
+      --forecast-text: calc(var(--base-size) * 1.05);
+      --metric-text: calc(var(--base-size) * 1.0);
+      --temp-size: calc(var(--base-size) * 2.2);
+      --small: calc(var(--base-size) * 0.95);
+      --gap: calc(var(--base-size) * 0.9);
+      --radius: 14px;
     }
-    html,body{height:100%;margin:0;background:radial-gradient(100% 120% at 20% 0%,#0a1c34,var(--bg) 60%);color:var(--text);
-      overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
-    .app{display:grid;grid-template-rows:auto 1fr auto;height:calc(100% - var(--ticker-h));
-      padding:calc(var(--gap)*1.2);box-sizing:border-box;gap:var(--gap);}
-    .header{display:grid;grid-template-columns:1fr auto;align-items:center;padding:calc(var(--gap)*.5) calc(var(--gap)*.6);}
-    .title{font-size:var(--header-size);font-weight:700;display:flex;align-items:baseline;gap:.6em;}
-    .location{color:var(--muted);font-size:calc(var(--header-size)*.6);font-weight:500;}
-    .clock{font-size:var(--header-size);font-variant-numeric:tabular-nums;color:var(--accent);text-shadow:0 0 18px rgba(97,218,251,.25);}
-    .forecast{display:grid;gap:var(--gap);grid-template-columns:repeat(7,1fr);align-content:center;}
-    @media (max-aspect-ratio:4/3),(max-width:1200px){.forecast{grid-template-columns:repeat(4,1fr);} }
-    @media (max-width:900px){.forecast{grid-template-columns:repeat(3,1fr);} }
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius);padding:calc(var(--gap)*1.0);display:grid;grid-template-rows:auto auto auto auto auto;justify-items:center;
-      text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25);min-height:250px;}
-    .day-name{font-size:var(--day-title);font-weight:700;}
-    .icon{display:block;width:clamp(56px,6vw,100px);height:clamp(56px,6vw,100px);margin:calc(var(--gap)*.2) 0;}
-    .icon svg{width:100%;height:100%;}
-    .short{font-size:var(--forecast-text);color:var(--muted);margin-top:2px;line-height:1.25;}
-    .temp{font-size:var(--temp-size);font-weight:800;letter-spacing:.5px;margin-top:calc(var(--gap)*.4);}
-    .metrics{display:grid;gap:4px;margin-top:6px;font-size:var(--metric-text);color:var(--muted);}
-    .footer{display:grid;grid-template-columns:1fr auto;align-items:center;color:var(--muted);font-size:var(--small);opacity:.95;padding:0 calc(var(--gap)*.6);}
-    .status{display:inline-flex;align-items:center;gap:8px;}
-    .pulse{width:10px;height:10px;border-radius:99px;background:#2bd576;box-shadow:0 0 0 0 rgba(43,213,118,.6);animation:pulse 2.4s infinite;}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(43,213,118,.6);}70%{box-shadow:0 0 0 16px rgba(43,213,118,0);}100%{box-shadow:0 0 0 0 rgba(43,213,118,0);} }
-    .ticker{position:fixed;left:0;right:0;bottom:0;height:var(--ticker-h);border-top:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.4);}
-    .ticker iframe{width:100%;height:100%;border:0;}
-    .diag{position:fixed;right:10px;top:10px;max-width:36ch;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);
-      padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.35;}
-    .diag b{color:var(--warn);}
-    .diag .err{color:var(--err);}
-    *{user-select:none;}
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(100% 120% at 20% 0%, #0a1c34, var(--bg) 60%);
+      color: var(--text);
+      overflow: hidden; /* full-screen, no scrollbars for signage */
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing: 0.2px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100%;
+      padding: calc(var(--gap) * 1.2);
+      box-sizing: border-box;
+      gap: var(--gap);
+    }
+
+    /* Header with title + live clock */
+    .header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: calc(var(--gap) * 0.5) calc(var(--gap) * 0.6);
+    }
+    .title {
+      font-size: var(--header-size);
+      font-weight: 700;
+      display: flex;
+      align-items: baseline;
+      gap: 0.6em;
+    }
+    .location {
+      color: var(--muted);
+      font-size: calc(var(--header-size) * 0.6);
+      font-weight: 500;
+    }
+    .clock {
+      font-size: var(--header-size);
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      text-shadow: 0 0 18px rgba(97,218,251,0.25);
+    }
+
+    /* Forecast grid */
+    .forecast {
+      display: grid;
+      gap: var(--gap);
+      grid-template-columns: repeat(7, 1fr); /* 7 across for landscape signage */
+      align-content: center;
+    }
+    /* Portrait/narrow wrapping */
+    @media (max-aspect-ratio: 4/3), (max-width: 1200px) {
+      .forecast { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .forecast { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: calc(var(--gap) * 1.0);
+      display: grid;
+      grid-template-rows: auto auto auto auto auto;
+      justify-items: center;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      min-height: 250px;
+    }
+
+    .day-name { font-size: var(--day-title); font-weight: 700; }
+    .icon { display: block; width: clamp(56px, 6vw, 100px); height: clamp(56px, 6vw, 100px); margin: calc(var(--gap) * 0.2) 0; }
+    .icon svg { width: 100%; height: 100%; }
+    .short { font-size: var(--forecast-text); color: var(--muted); margin-top: 2px; line-height: 1.25; }
+    .temp { font-size: var(--temp-size); font-weight: 800; letter-spacing: 0.5px; margin-top: calc(var(--gap) * 0.4); }
+
+    .metrics {
+      display: grid;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: var(--metric-text);
+      color: var(--muted);
+    }
+
+    /* Footer: status + updated time */
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      color: var(--muted);
+      font-size: var(--small);
+      opacity: 0.95;
+      padding: 0 calc(var(--gap) * 0.6);
+    }
+    .status { display: inline-flex; align-items: center; gap: 8px; }
+    .pulse {
+      width: 10px; height: 10px; border-radius: 99px; background: #2bd576;
+      box-shadow: 0 0 0 0 rgba(43,213,118,0.6); animation: pulse 2.4s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(43,213,118,0.6); }
+      70% { box-shadow: 0 0 0 16px rgba(43,213,118,0); }
+      100% { box-shadow: 0 0 0 0 rgba(43,213,118,0); }
+    }
+
+    * { user-select: none; }
   </style>
 </head>
+
 <body>
   <div class="app">
+    <!-- Header -->
     <div class="header">
       <div class="title">
         <span>7‑Day Weather Forecast</span>
@@ -58,8 +153,10 @@
       <div class="clock" id="clock">--:-- --</div>
     </div>
 
+    <!-- Forecast Grid -->
     <div class="forecast" id="forecast" aria-live="polite"></div>
 
+    <!-- Footer -->
     <div class="footer">
       <div class="status">
         <span class="pulse" id="statusPulse" title="Data OK"></span>
@@ -69,162 +166,179 @@
     </div>
   </div>
 
-  <!-- On-screen diagnostics -->
-  <div id="diag" class="diag" style="display:none"></div>
-
-  <!-- TradingView ticker (no API key). Change symbols in the JSON after # if desired. -->
-  <div class="ticker">
-    <iframe title="Stock Ticker"
-      src="https://s.tradingview.com/embed-widget/ticker-tape/?locale=en#{
-        &quot;symbols&quot;:[
-          {&quot;proName&quot;:&quot;NASDAQ:MSFT&quot;,&quot;title&quot;:&quot;Microsoft&quot;},
-          {&quot;proName&quot;:&quot;NASDAQ:AAPL&quot;,&quot;title&quot;:&quot;Apple&quot;},
-          {&quot;proName&quot;:&quot;NASDAQ:NVDA&quot;,&quot;title&quot;:&quot;NVIDIA&quot;},
-          {&quot;proName&quot;:&quot;NASDAQ:AMZN&quot;,&quot;title&quot;:&quot;Amazon&quot;},
-          {&quot;proName&quot;:&quot;NASDAQ:GOOGL&quot;,&quot;title&quot;:&quot;Alphabet&quot;},
-          {&quot;proName&quot;:&quot;NASDAQ:META&quot;,&quot;title&quot;:&quot;Meta&quot;},
-          {&quot;proName&quot;:&quot;NASDAQ:TSLA&quot;,&quot;title&quot;:&quot;Tesla&quot;},
-          {&quot;proName&quot;:&quot;NYSE:UNH&quot;,&quot;title&quot;:&quot;UnitedHealth&quot;},
-          {&quott;title&quot;:&quot;JPMorgan&quot;},
-          {&quot;proName&quot;:&quot;NYSE:XOM&quot;,&quot;title&quot;:&quot;ExxonMobil&quot;}
-        ],
-        &quot;showSymbolLogo&quot;:true,
-        &quot;colorTheme&quot;:&quot;dark&quot;,
-        &quot;isTransparent&quot;:true,
-        &quot;displayMode&quot;:&quot;adaptive&quot;,
-        &quot;locale&quot;:&quot;en&quot;
-      }
-    </iframe>
-  </div>
-
   <script>
-    /* ===== Config ===== */
-    const LAT = 32.7767, LON = -96.7970; // Dallas
-    const WEATHER_REFRESH_MS = 15 * 60 * 1000;
-    const WEATHER_API = `https://api.open-meteo.com/v1/forecast`
-      + `?latitude=${LAT}&longitude=${LON}`
-      + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant`
-      + `&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+    /* ====== CONFIG ====== */
+    // Dallas, TX - change these if you need a different facility
+    const LAT = 32.7767;
+    const LON = -96.7970;
 
-    /* ===== Helpers ===== */
-    const diagEl = document.getElementById('diag');
-    function showDiag(msg, isError=false){
-      diagEl.style.display = 'block';
-      diagEl.innerHTML = (isError ? '<b class="err">Error:</b> ' : '<b>Info:</b> ') + msg;
-      console.log('[DIAG]', msg);
-    }
-    function updateClock(){
-      const now=new Date();
-      document.getElementById('clock').textContent = now.toLocaleString(undefined,{
-        hour:'numeric',minute:'2-digit',weekday:'short',month:'short',day:'numeric'
+    // Auto-refresh period (ms) for signage
+    const REFRESH_MS = 15 * 60 * 1000; // 15 minutes
+
+    // Open‑Meteo daily variables (°F + mph + UV + wind)
+    // If you ever see missing UV values for some regions, append &models=gfs_seamless
+    const API = `https://api.open-meteo.com/v1/forecast` +
+      `?latitude=${LAT}&longitude=${LON}` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant` +
+      `&timezone=auto&forecast_days=7&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+
+    /* ====== CLOCK ====== */
+    function updateClock() {
+      const now = new Date();
+      const timeString = now.toLocaleString(undefined, {
+        hour: 'numeric', minute: '2-digit',
+        weekday: 'short', month: 'short', day: 'numeric'
       });
+      document.getElementById('clock').textContent = timeString;
     }
-    setInterval(updateClock,1000); updateClock();
+    setInterval(updateClock, 1000); updateClock();
 
-    function setStatus(ok,text){
-      document.getElementById('statusText').textContent = text || (ok?'OK':'Retrying…');
-      document.getElementById('statusPulse').style.background = ok ? '#2bd576' : '#ff6b6b';
+    /* ====== STATUS ====== */
+    function setStatus(ok, text) {
+      const pulse = document.getElementById('statusPulse');
+      const statusText = document.getElementById('statusText');
+      statusText.textContent = text || (ok ? 'OK' : 'Retrying…');
+      pulse.style.background = ok ? '#2bd576' : '#ff6b6b';
     }
 
-    function iconSvg(code){
-      const base=(path,extra='')=>`<svg viewBox="0 0 48 48" width="100%" height="100%" role="img" aria-hidden="true"><g fill="none" stroke="#eaf6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${path}</g>${extra}</svg>`;
-      const sun=`<circle cx="24" cy="24" r="8" fill="none"/><path d="M24 6v6M24 36v6M6 24h6M36 24h6M11 11l4 4M33 33l4 4M11 37l4-4M33 15l4-4"/>`;
-      const cloud=`<path d="M16 33h17a7 7 0 0 0 0-14 10 10 0 0 0-19-3 6 6 0 0 0 2 17z"/>`;
-      const rain=`<path d="M19 38l-2 6M25 38l-2 6M31 38l-2 6"/>`;
-      const heavyRain=`<path d="M17 37l-2 7M23 37l-2 7M29 37l-2 7M35 37l-2 7"/>`;
-      const snow=`<path d="M18 38l3 6M24 38v6M30 38l-3 6 M15 41h6 M21 41h6 M27 41h6"/>`;
-      const lightning=`<path d="M24 30l-4 8h5l-3 8 10-14h-5l3-8z"/>`;
-      const fog=`<path d="M10 34h28M8 40h32" />`;
-      if(code===0) return base(sun);
-      if([1,2].includes(code)) return base(`${sun}${cloud}`);
-      if(code===3) return base(`${cloud}${cloud.replace('M16','M12').replace('h17','h22')}`);
-      if(code===45||code===48) return base(cloud,`<g stroke="#a7c4de" stroke-width="3">${fog}</g>`);
-      if([51,53,55,56,57].includes(code)) return base(`${cloud}${rain}`);
-      if([61,63,66].includes(code)) return base(`${cloud}${rain}`);
-      if([65,67].includes(code)) return base(`${cloud}${heavyRain}`);
-      if([71,73,75,77].includes(code)) return base(`${cloud}${snow}`);
-      if([80,81].includes(code)) return base(`${cloud}${rain}`);
-      if(code===82) return base(`${cloud}${heavyRain}`);
-      if([85,86].includes(code)) return base(`${cloud}${snow}`);
-      if([95,96,99].includes(code)) return base(`${cloud}${lightning}`);
+    /* ====== ICONS (SVG, signage-safe) ====== */
+    function iconSvg(code) {
+      const base = (path, extra='') => `
+        <svg viewBox="0 0 48 48" width="100%" height="100%" role="img" aria-hidden="true">
+          <g fill="none" stroke="#eaf6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            ${path}
+          </g>
+          ${extra}
+        </svg>`;
+      const sun = `
+        <circle cx="24" cy="24" r="8" fill="none"/>
+        <path d="M24 6v6M24 36v6M6 24h6M36 24h6M11 11l4 4M33 33l4 4M11 37l4-4M33 15l4-4"/>`;
+      const cloud = `<path d="M16 33h17a7 7 0 0 0 0-14 10 10 0 0 0-19-3 6 6 0 0 0 2 17z"/>`;
+      const rain = `<path d="M19 38l-2 6M25 38l-2 6M31 38l-2 6"/>`;
+      const heavyRain = `<path d="M17 37l-2 7M23 37l-2 7M29 37l-2 7M35 37l-2 7"/>`;
+      const snow = `<path d="M18 38l3 6M24 38v6M30 38l-3 6 M15 41h6 M21 41h6 M27 41h6" />`;
+      const lightning = `<path d="M24 30l-4 8h5l-3 8 10-14h-5l3-8z"/>`;
+      const fog = `<path d="M10 34h28M8 40h32" />`;
+
+      if (code === 0) return base(sun);
+      if ([1,2].includes(code)) return base(`${sun}${cloud}`);
+      if (code === 3) return base(`${cloud}${cloud.replace('M16','M12').replace('h17','h22')}`);
+      if (code === 45 || code === 48) return base(cloud, `<g stroke="#a7c4de" stroke-width="3">${fog}</g>`);
+      if ([51,53,55,56,57].includes(code)) return base(`${cloud}${rain}`);
+      if ([61,63,66].includes(code)) return base(`${cloud}${rain}`);
+      if ([65,67].includes(code)) return base(`${cloud}${heavyRain}`);
+      if ([71,73,75,77].includes(code)) return base(`${cloud}${snow}`);
+      if ([80,81].includes(code)) return base(`${cloud}${rain}`);
+      if (code === 82) return base(`${cloud}${heavyRain}`);
+      if ([85,86].includes(code)) return base(`${cloud}${snow}`);
+      if ([95,96,99].includes(code)) return base(`${cloud}${lightning}`);
       return base(cloud);
     }
 
-    const LABELS={0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',
+    /* ====== LABELS ====== */
+    const LABELS = {
+      0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',
       51:'Drizzle',53:'Drizzle',55:'Drizzle',56:'Freezing drizzle',57:'Freezing drizzle',
       61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Freezing rain',
       71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',
       80:'Showers',81:'Showers',82:'Heavy showers',85:'Snow showers',86:'Snow showers',
-      95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'};
+      95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'
+    };
 
-    function dayLabel(s){const d=new Date(s+'T12:00:00');return d.toLocaleDateString(undefined,{weekday:'short'});}
-    function degToCardinal(deg){const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];return dirs[Math.round((deg%360)/22.5)%16];}
-
-    function renderWeather(data){
-      const container=document.getElementById('forecast');container.innerHTML='';
-      const d=data.daily;
-      const {time,weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,
-             uv_index_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant}=d;
-
-      for(let i=0;i<time.length;i++){
-        const code=weather_code[i];
-        const card=document.createElement('div');card.className='card';
-
-        const day=document.createElement('div');day.className='day-name';day.textContent=dayLabel(time[i]);
-        const iconWrap=document.createElement('div');iconWrap.className='icon';iconWrap.innerHTML=iconSvg(code);
-
-        const short=document.createElement('div');short.className='short';
-        const pop=precipitation_probability_max?.[i];const label=LABELS[code]??'—';
-        short.textContent=(pop!=null)?`${label} · ${pop}% precip`:label;
-
-        const temp=document.createElement('div');temp.className='temp';
-        temp.textContent=`${Math.round(temperature_2m_max[i])}° / ${Math.round(temperature_2m_min[i])}°`;
-
-        const metrics=document.createElement('div');metrics.className='metrics';
-        const uv=Math.round(uv_index_max?.[i]??0);
-        const w=Math.round(wind_speed_10m_max?.[i]??0);
-        const wg=Math.round(wind_gusts_10m_max?.[i]??0);
-        const wdir=wind_direction_10m_dominant?.[i];
-        const wdirTxt=(typeof wdir==='number')?degToCardinal(wdir):'—';
-        metrics.innerHTML=`<div>UV: <strong style="color:#fff">${uv}</strong></div>
-                           <div>Wind: <strong style="color:#fff">${w} mph</strong> (gusts ${wg} mph · ${wdirTxt})</div>`;
-
-        card.append(day,iconWrap,short,temp,metrics);container.appendChild(card);
-      }
-      setStatus(true,'Live');
-      document.getElementById('updated').textContent='Last updated: '+new Date().toLocaleTimeString();
-      showDiag('Forecast loaded successfully.');
+    function dayLabel(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00'); // avoid tz edge cases
+      return d.toLocaleDateString(undefined, { weekday: 'short' });
     }
 
-    let firstFetchDone=false;
-    setTimeout(()=>{ if(!firstFetchDone){ setStatus(false,'Connection issue – will retry'); showDiag('Initial fetch timed out after 7s. Will retry…', true); } }, 7000);
+    function degToCardinal(deg) {
+      const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+      return dirs[Math.round((deg % 360) / 22.5) % 16];
+    }
 
-    async function refreshWeather(){
-      try{
-        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-          throw new Error('Device appears offline');
-        }
-        setStatus(true,'Updating…');
-        showDiag('Fetching: ' + WEATHER_API.replace(/&/g,'&amp;'));
-        const r=await fetch(WEATHER_API,{cache:'no-store',mode:'cors'});
-        if(!r.ok) {
-          const txt = await r.text().catch(()=> '');
-          throw new Error(`HTTP ${r.status} ${r.statusText} — ${txt.slice(0,140)}…`);
-        }
-        const j=await r.json();
-        firstFetchDone=true;
-        renderWeather(j);
-      }catch(e){
+    /* ====== RENDER ====== */
+    function render(data) {
+      const container = document.getElementById('forecast');
+      container.innerHTML = '';
+
+      const d = data.daily;
+      const { time, weather_code, temperature_2m_max, temperature_2m_min,
+              precipitation_probability_max, uv_index_max,
+              wind_speed_10m_max, wind_gusts_10m_max, wind_direction_10m_dominant } = d;
+
+      for (let i = 0; i < time.length; i++) {
+        const code = weather_code[i];
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const day = document.createElement('div');
+        day.className = 'day-name';
+        day.textContent = dayLabel(time[i]);
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'icon';
+        iconWrap.innerHTML = iconSvg(code);
+
+        const short = document.createElement('div');
+        short.className = 'short';
+        const pop = precipitation_probability_max?.[i];
+        const label = LABELS[code] ?? '—';
+        short.textContent = (pop != null) ? `${label} · ${pop}% precip` : label;
+
+        const temp = document.createElement('div');
+        temp.className = 'temp';
+        temp.textContent = `${Math.round(temperature_2m_max[i])}° / ${Math.round(temperature_2m_min[i])}°`;
+
+        const metrics = document.createElement('div');
+        metrics.className = 'metrics';
+        const uv = Math.round(uv_index_max?.[i] ?? 0);
+        const w = Math.round(wind_speed_10m_max?.[i] ?? 0);
+        const wg = Math.round(wind_gusts_10m_max?.[i] ?? 0);
+        const wdir = wind_direction_10m_dominant?.[i];
+        const wdirTxt = (typeof wdir === 'number') ? degToCardinal(wdir) : '—';
+
+        metrics.innerHTML = `
+          <div>UV: <strong style="color:#fff">${uv}</strong></div>
+          <div>Wind: <strong style="color:#fff">${w} mph</strong> (gusts ${wg} mph · ${wdirTxt})</div>
+        `;
+
+        card.append(day, iconWrap, short, temp, metrics);
+        container.appendChild(card);
+      }
+
+      setStatus(true, 'Live');
+      document.getElementById('updated').textContent =
+        'Last updated: ' + new Date().toLocaleTimeString();
+    }
+
+    /* ====== REFRESH ====== */
+    async function refresh() {
+      try {
+        setStatus(true, 'Updating…');
+        const r = await fetch(API, { cache: 'no-store' });
+        if (!r.ok) throw new Error('API error ' + r.status);
+        const j = await r.json();
+        render(j);
+      } catch (e) {
         console.error(e);
-        setStatus(false,'Connection issue – will retry');
-        showDiag(String(e && e.message || e), true);
+        setStatus(false, 'Connection issue – will retry');
       }
     }
 
-    refreshWeather();
-    setInterval(refreshWeather, WEATHER_REFRESH_MS);
-    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refreshWeather(); });
-    setTimeout(()=>{ const ok=document.getElementById('forecast').children.length>0; if(!ok) refreshWeather(); },8000);
+    // Initial load + auto refresh
+    refresh();
+    setInterval(refresh, REFRESH_MS);
+
+    // Resume updates when tab becomes visible (some signage kernels pause timers)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refresh();
+    });
+
+    // Fail-safe: retry shortly if first load did not populate
+    setTimeout(() => {
+      const filled = document.getElementById('forecast').children.length > 0;
+      if (!filled) refresh();
+    }, 8000);
   </script>
 </body>
 </html>
