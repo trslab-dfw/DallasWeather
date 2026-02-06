@@ -95,7 +95,7 @@ function renderWeather(data){
   }
   setStatus(true,'Live');
   document.getElementById('updated').textContent='Last updated: '+new Date().toLocaleTimeString();
-  showDiag('Forecast loaded successfully.');
+  /showDiag('Forecast loaded successfully.');
 }
 
 let firstFetchDone=false;
@@ -127,3 +127,4 @@ refreshWeather();
 setInterval(refreshWeather, WEATHER_REFRESH_MS);
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refreshWeather(); });
 setTimeout(()=>{ const ok=document.getElementById('forecast').children.length>0; if(!ok) refreshWeather(); },8000);
+
