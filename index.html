@@ -6,25 +6,23 @@
 
   <meta charset="UTF-8" />
 
-  <!-- Intentionally no meta CSP (some signage webviews inject their own) -->
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Dallas Weather + Stock Ticker</title>
 
 
 
-  <!-- Load the stylesheet correctly -->
+  <!-- ? Correct stylesheet include -->
 
-  styles.css?v=2
+  <link rel="stylesheet" href="styles.css?v=2" />
 
 </head>
+
+
 
 <body>
 
   <div class="app">
-
-    <!-- Header -->
 
     <div class="header">
 
@@ -42,13 +40,9 @@
 
 
 
-    <!-- Forecast grid -->
-
     <div class="forecast" id="forecast" aria-live="polite"></div>
 
 
-
-    <!-- Footer -->
 
     <div class="footer">
 
@@ -68,13 +62,9 @@
 
 
 
-  <!-- On-screen diagnostics (shows any fetch/HTTP error) -->
-
   <div id="diag" class="diag"></div>
 
 
-
-  <!-- TradingView ticker (no API key). Edit the JSON after # to change symbols -->
 
   <div class="ticker">
 
@@ -114,9 +104,13 @@
 
         &quot;colorTheme&quot;:&quot;dark&quot;,
 
-        &quot;isTransparent&quot;;en&quot;
+        &quot;isTransparent&quot;:true,
 
-      }
+        &quot;displayMode&quot;:&quot;adaptive&quot;
+
+      }"
+
+      loading="lazy">
 
     </iframe>
 
@@ -124,9 +118,9 @@
 
 
 
-  <!-- Load the JavaScript correctly -->
+  <!-- ? Correct JS include -->
 
-  app.js?v=2</script>
+  <script src="app.js?v=2"></script>
 
 </body>
 
