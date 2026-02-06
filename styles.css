@@ -16,8 +16,9 @@ html,body{
   padding:calc(var(--gap)*1.2); box-sizing:border-box; gap:var(--gap);}
 .header{
   display:flex;
-  flex-direction:column;
-  gap:6px;
+  align-items:center;
+  justify-content:space-between;
+  padding:calc(var(--gap)*.5) calc(var(--gap)*.6);
 }
 
 .header-left{
@@ -26,8 +27,17 @@ html,body{
   gap:16px;
 }
 
+.logo{
+  height:56px;
+  width:auto;
+  filter: drop-shadow(0 0 8px rgba(0,0,0,.6));
+}
+
 .clock{
-  align-self:flex-end;
+  font-size:var(--header-size);
+  font-variant-numeric:tabular-nums;
+  color:var(--accent);
+  text-shadow:0 0 18px rgba(97,218,251,.25);
 }
 
 
@@ -72,6 +82,7 @@ html,body{
 .diag b{color:var(--warn);} .diag .err{color:var(--err);}
 
 *{user-select:none;}
+
 
 
 
