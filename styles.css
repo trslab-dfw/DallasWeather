@@ -14,8 +14,13 @@ html,body{
 }
 .app{display:grid;grid-template-rows:auto 1fr auto;height:calc(100% - var(--ticker-h));
   padding:calc(var(--gap)*1.2); box-sizing:border-box; gap:var(--gap);}
-.header{display:grid;grid-template-columns:1fr auto;align-items:center;
-  padding:calc(var(--gap)*.5) calc(var(--gap)*.6);}
+.header{
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:8px;
+  padding:calc(var(--gap)*.5) calc(var(--gap)*.6);
+}
+
 .header-left{
   display:flex;
   align-items:center;
@@ -68,6 +73,7 @@ html,body{
 .diag b{color:var(--warn);} .diag .err{color:var(--err);}
 
 *{user-select:none;}
+
 
 
 
