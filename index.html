@@ -1,65 +1,133 @@
-
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <!-- Intentionally no meta CSP (some signage webviews inject their own) -->
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Dallas Weather + Stock Ticker</title>
 
+
+
   <!-- Load the stylesheet correctly -->
-  https://trslab-dfw.github.io/DallasWeather/styles.css?v=2
+
+  styles.css?v=2
+
 </head>
+
 <body>
+
   <div class="app">
+
     <!-- Header -->
+
     <div class="header">
+
       <div class="title">
-        <span>7‑Day Weather Forecast</span>
+
+        <span>7-Day Weather Forecast</span>
+
         <span class="location" id="locationLabel">Dallas, TX</span>
+
       </div>
+
       <div class="clock" id="clock">--:-- --</div>
+
     </div>
+
+
 
     <!-- Forecast grid -->
+
     <div class="forecast" id="forecast" aria-live="polite"></div>
 
+
+
     <!-- Footer -->
+
     <div class="footer">
+
       <div class="status">
+
         <span class="pulse" id="statusPulse" title="Data OK"></span>
+
         <span id="statusText">Connecting…</span>
+
       </div>
+
       <div id="updated">Last updated: —</div>
+
     </div>
+
   </div>
 
+
+
   <!-- On-screen diagnostics (shows any fetch/HTTP error) -->
+
   <div id="diag" class="diag"></div>
 
+
+
   <!-- TradingView ticker (no API key). Edit the JSON after # to change symbols -->
+
   <div class="ticker">
+
     <iframe
+
       title="Stock Ticker"
+
       style="width:100%;height:100%;border:0;"
+
       src="https://s.tradingview.com/embed-widget/ticker-tape/?locale=en#{
+
         &quot;symbols&quot;:[
+
           {&quot;proName&quot;:&quot;NASDAQ:MSFT&quot;,&quot;title&quot;:&quot;Microsoft&quot;},
+
           {&quot;proName&quot;:&quot;NASDAQ:AAPL&quot;,&quot;title&quot;:&quot;Apple&quot;},
+
           {&quot;proName&quot;:&quot;NASDAQ:NVDA&quot;,&quot;title&quot;:&quot;NVIDIA&quot;},
+
           {&quot;proName&quot;:&quot;NASDAQ:AMZN&quot;,&quot;title&quot;:&quot;Amazon&quot;},
+
           {&quot;proName&quot;:&quot;NASDAQ:GOOGL&quot;,&quot;title&quot;:&quot;Alphabet&quot;},
+
           {&quot;proName&quot;:&quot;NASDAQ:META&quot;,&quot;title&quot;:&quot;Meta&quot;},
+
           {&quot;proName&quot;:&quot;NASDAQ:TSLA&quot;,&quot;title&quot;:&quot;Tesla&quot;},
+
           {&quot;proName&quot;:&quot;NYSE:UNH&quot;,&quot;title&quot;:&quot;UnitedHealth&quot;},
+
           {&quot;proName&quot;:&quot;NYSE:JPM&quot;,&quot;title&quot;:&quot;JPMorgan&quot;},
+
           {&quot;proName&quot;:&quot;NYSE:XOM&quot;,&quot;title&quot;:&quot;ExxonMobil&quot;}
+
         ],
+
         &quot;showSymbolLogo&quot;:true,
+
         &quot;colorTheme&quot;:&quot;dark&quot;,
-        &quot;isTransparent&quot;:true,
-        &quot;displayMode&quot;:&quot;adaptive&quot;,
-        &orrectly -->
+
+        &quot;isTransparent&quot;;en&quot;
+
+      }
+
+    </iframe>
+
+  </div>
+
+
+
+  <!-- Load the JavaScript correctly -->
+
   app.js?v=2</script>
+
 </body>
+
 </html>
